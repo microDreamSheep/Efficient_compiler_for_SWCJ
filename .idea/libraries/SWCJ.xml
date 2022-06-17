@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="SWCJ">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/SWCJ.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
