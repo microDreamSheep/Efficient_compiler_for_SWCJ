@@ -4,6 +4,8 @@ import com.midream.sheep.swcj.Exception.ConfigException;
 import com.midream.sheep.swcj.Exception.EmptyMatchMethodException;
 import com.midream.sheep.swcj.Exception.InterfaceIllegal;
 import com.midream.sheep.swcj.core.build.builds.effecient.EffecientBuilder;
+import com.midream.sheep.swcj.core.build.builds.effecient.data.EConstant;
+import com.midream.sheep.swcj.core.build.builds.effecient.data.Econtrol;
 import com.midream.sheep.swcj.core.factory.SWCJXmlFactory;
 import com.midream.sheep.swcj.core.factory.xmlfactory.CoreXmlFactory;
 import org.xml.sax.SAXException;
@@ -19,10 +21,11 @@ import java.util.List;
 
 public class main {
     public static void main(String[] args) throws IOException, ConfigException, ParserConfigurationException, SAXException, EmptyMatchMethodException, InterfaceIllegal {
+
         SWCJXmlFactory swcjXmlFactory = new CoreXmlFactory();
         swcjXmlFactory.setBuilder(new EffecientBuilder()).parse(new File("E:\\SWCJ\\core\\SWCJ\\target\\test-classes\\test.xml"));
         pojo html = (pojo)swcjXmlFactory.getWebSpider("getHtml");
-        image[] images = html.get("5", "4");
+        image[] images = html.getIt("5", "4");
         for (image image : images) {
             System.out.println(image.toString());
         }

@@ -8,41 +8,41 @@ public class Econtrol {
     public final List<byte[]> Constants = new LinkedList<>();
 
     public Econtrol() {
+        fillData();
+    }
+    private void fillData(){
         Constants.add(new byte[]{
-                0x0A, 0x00, 0x05, 0x00, 0x12//java/lang/Object."<init>":()V
+                0x0A, 0x00, 0x05, 0x00, 0x11//java/lang/Object."<init>":()V
         });
         Constants.add(new byte[]{
-                0x07, 0x00, 0x13//com/midream/sheep/swcj/core/analyzer/CornAnalyzer
+                0x07, 0x00, 0x12//com/midream/sheep/swcj/core/analyzer/CornAnalyzer
         });
         Constants.add(new byte[]{
-                0x0A, 0x00, 0x02, 0x00, 0x12//com/midream/sheep/swcj/core/analyzer/CornAnalyzer."<init>":()V
+                0x0A, 0x00, 0x02, 0x00, 0x11//com/midream/sheep/swcj/core/analyzer/CornAnalyzer."<init>":()V
         });
         Constants.add(new byte[]{
-                0x08, 0x00, 0x14//指向第一个执行逻辑 --------------------------------
+                0x08, 0x00, 0x13//指向第一个执行逻辑 --------------------------------
         });
         Constants.add(new byte[]{
-                0x07, 0x00, 0x15 // java/lang/Object
+                0x07, 0x00, 0x14 // java/lang/Object
         });
         Constants.add(new byte[]{
-                0x0A, 0x00, 0x16, 0x00, 0x17// java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+                0x0A, 0x00, 0x02, 0x00, 0x15// com/midream/sheep/swcj/core/analyzer/CornAnalyzer.execute:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/List;
         });
         Constants.add(new byte[]{
-                0x0A, 0x00, 0x02, 0x00, 0x18// com/midream/sheep/swcj/core/analyzer/CornAnalyzer.execute:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/List;
+                0x07, 0x00, 0x16//指向返回值类型
         });
         Constants.add(new byte[]{
-                0x07, 0x00, 0x19//指向返回值类型
+                0x0B, 0x00, 0x17, 0x00, 0x18// java/util/List.toArray:([Ljava/lang/Object;)[Ljava/lang/Object;
         });
         Constants.add(new byte[]{
-                0x0B, 0x00, 0x1A, 0x00, 0x1B// java/util/List.toArray:([Ljava/lang/Object;)[Ljava/lang/Object;
+                0x07,0x00,0x19// 指向返回值类型
         });
         Constants.add(new byte[]{
-                0x07,0x00,0x1C// 指向返回值类型
+                0x07, 0x00, 0x1A//指向类名
         });
         Constants.add(new byte[]{
-                0x07, 0x00, 0x1D//指向类名
-        });
-        Constants.add(new byte[]{
-                0x07, 0x00, 0x1E//指向接口名
+                0x07, 0x00, 0x1B//指向接口名
         });
         Constants.add(new byte[]{
                 0x01, 0x00, 0x06, 0x3C, 0x69, 0x6E, 0x69, 0x74, 0x3E// <init>
@@ -53,13 +53,15 @@ public class Econtrol {
         Constants.add(new byte[]{
                 0x01, 0x00, 0x04, 0x43, 0x6F, 0x64, 0x65//code
         });
+
         //方法名-->utf
         Constants.add(new byte[0]);
+
         //方法描述符-->utf
         Constants.add(new byte[0]);
 
         Constants.add(new byte[]{
-                0x0C, 0x00, 0x0D, 0x00, 0x0E//NameAndType    "<init>":()V
+                0x0C, 0x00, 0x0C, 0x00, 0x0D//NameAndType    "<init>":()V
         });
         Constants.add(new byte[]{
                 0x01, 0x00, 0x31, 0x63, 0x6F, 0x6D, 0x2F, 0x6D, 0x69, 0x64, 0x72, 0x65, 0x61, 0x6D, 0x2F, 0x73,
@@ -75,40 +77,25 @@ public class Econtrol {
                 0x65, 0x63, 0x74//java/lang/Object
         });
         Constants.add(new byte[]{
-                0x07, 0x00, 0x1F// java/lang/Integer
+                0x0C, 0x00, 0x1C, 0x00, 0x1D// execute:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/List;
         });
-        Constants.add(new byte[]{
-                0x0C, 0x00, 0x20, 0x00, 0x21//valueOf:(I)Ljava/lang/Integer;
-        });
-        Constants.add(new byte[]{
-                0x0C, 0x00, 0x22, 0x00, 0x23// execute:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/List;
-        });
-        //返回值--->utf
+        //返回值 具体--->utf
         Constants.add(new byte[0]);
+
         Constants.add(new byte[]{
-                0x07, 0x00, 0x24//List
+                0x07, 0x00, 0x1E//List
         });
         Constants.add(new byte[]{
-                0x0C, 0x00, 0x25, 0x00, 0x26//toArray:([Ljava/lang/Object;)[Ljava/lang/Object;
+                0x0C, 0x00, 0x1F, 0x00, 0x20//toArray:([Ljava/lang/Object;)[Ljava/lang/Object;
         });
-        //返回值-->utf
+        //返回值 数组-->utf
         Constants.add(new byte[0]);
+
         //类名-->utf
         Constants.add(new byte[0]);
         //接口名
         Constants.add(new byte[0]);
 
-        Constants.add(new byte[]{
-                0x01, 0x00, 0x11, 0x6A, 0x61, 0x76, 0x61, 0x2F, 0x6C, 0x61, 0x6E, 0x67, 0x2F, 0x49, 0x6E, 0x74,
-                0x65, 0x67, 0x65, 0x72//java/lang/Integer
-        });
-        Constants.add(new byte[]{
-                0x01, 0x00, 0x07, 0x76, 0x61, 0x6C, 0x75, 0x65, 0x4F, 0x66//valueOf
-        });
-        Constants.add(new byte[]{
-                0x01, 0x00, 0x16, 0x28, 0x49, 0x29, 0x4C, 0x6A, 0x61, 0x76, 0x61, 0x2F, 0x6C, 0x61, 0x6E, 0x67,
-                0x2F, 0x49, 0x6E, 0x74, 0x65, 0x67, 0x65, 0x72, 0x3B//(I)Ljava/lang/Integer;
-        });
         Constants.add(new byte[]{
                 0x01, 0x00, 0x07, 0x65, 0x78, 0x65, 0x63, 0x75, 0x74, 0x65//execute
         });
@@ -128,8 +115,7 @@ public class Econtrol {
         Constants.add(new byte[]{
                 0x01, 0x00, 0x28, 0x28, 0x5B, 0x4C, 0x6A, 0x61, 0x76, 0x61, 0x2F, 0x6C, 0x61, 0x6E, 0x67, 0x2F,
                 0x4F, 0x62, 0x6A, 0x65, 0x63, 0x74, 0x3B, 0x29, 0x5B, 0x4C, 0x6A, 0x61, 0x76, 0x61, 0x2F, 0x6C,
-                0x61, 0x6E, 0x67, 0x2F, 0x4F, 0x62, 0x6A, 0x65, 0x63, 0x74, 0x3B
+                0x61, 0x6E, 0x67, 0x2F, 0x4F, 0x62, 0x6A, 0x65, 0x63, 0x74, 0x3B        // ([Ljava/lang/Object;)[Ljava/lang/Object;
         });
-        // ([Ljava/lang/Object;)[Ljava/lang/Object;
     }
 }
