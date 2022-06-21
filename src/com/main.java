@@ -21,12 +21,15 @@ import java.util.List;
 
 public class main {
     public static void main(String[] args) throws IOException, ConfigException, ParserConfigurationException, SAXException, EmptyMatchMethodException, InterfaceIllegal {
-
         SWCJXmlFactory swcjXmlFactory = new CoreXmlFactory();
         swcjXmlFactory.setBuilder(new EffecientBuilder()).parse(new File("E:\\SWCJ\\core\\SWCJ\\target\\test-classes\\test.xml"));
+        long start = System.currentTimeMillis();
         pojo html = (pojo)swcjXmlFactory.getWebSpider("getHtml");
-        image[] images = html.getIt("4");
-        for (image image : images) {
+        long end = System.currentTimeMillis();
+        System.out.println(end-start);
+        image[] images1 = html.gethtml("5");
+
+        for (image image : images1) {
             System.out.println(image.toString());
         }
     }

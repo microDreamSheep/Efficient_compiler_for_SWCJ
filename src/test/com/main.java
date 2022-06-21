@@ -18,7 +18,7 @@ public class main {
         pojo html = (pojo)swcjXmlFactory.getWebSpider("getHtml");
         long end = System.currentTimeMillis();
         System.out.println("构建类花费"+(end-start));
-        image[] images = html.getIt("5");
+        image[] images = html.gethtml("5");
         for (image image : images) {
             System.out.println(image.toString());
         }

@@ -22,14 +22,14 @@ public class EConstant {
             0x00, 0x0E,//code表
             0x00, 0x00, 0x00, 0x35,//表长度
             0x00, 0x06,//栈最大深度
-            0x00, 0x03,//max_local
+            0x00, 0x10,//max_local
             0x00, 0x00, 0x00, 0x29,//code_length
             /*13*/
             (byte) 0xBB, 0x00, 0x02,//new
             0x59,//压栈
             (byte) 0xB7, 0x00, 0x03,//调用分析器构造方法
             0x12, (byte) 0xFF,//idc 从常量池拿执行逻辑
-            0x05,//iconst_2
+            0x10, (byte) 0xFF,
             (byte) 0xBD, 0x00, 0x05,//创建object引用类型数组
             /*留给字符注入*/
     };
@@ -42,7 +42,6 @@ public class EConstant {
             (byte) 0xB0,
 
             0x00, 0x00,//没有异常表
-            0x00, 0x00,
             0x00, 0x00//其他表数量为2
     };
     private static byte[] BipushCode = {0x59, 0x10, (byte) 0xFF, 0x19, (byte) 0xFF, 0x53};
@@ -71,11 +70,17 @@ public class EConstant {
             point++;
         }
         //注入方法
+        //注入方法名
         datas[3] = (byte) methodname;
+        //注入方法描述
         datas[5] = (byte) methoddescription;
-        datas[13] = (byte) (InstanceMethod_Template_after.length+InstanceMethod_Template_before.length-14+count*6-2);
-        datas[21] = (byte) (35+count*6-6);
+        datas[17] = (byte) ((byte) 1+count);
+        //注入方法长度
+        datas[13] = (byte) (InstanceMethod_Template_after.length+InstanceMethod_Template_before.length-14+count*6);
+        datas[21] = (byte) (35+count*6-5);
+        //注入方法执行逻辑引用
         datas[30] = (byte) executePointer;
+        datas[32] = (byte) count;
         byte[] code = getBipushCode(count);
         //注入实际执行
         for (byte b : code) {

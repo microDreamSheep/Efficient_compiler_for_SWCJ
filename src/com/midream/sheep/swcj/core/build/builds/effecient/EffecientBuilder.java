@@ -37,11 +37,10 @@ public class EffecientBuilder implements SWCJBuilder {
         EVariables eVariables = swcjCodeClass.getCount();
         SWCJClass sclass = null;
         try {
-            sclass = com.midream.sheep.swcj.core.build.builds.javanative.BuildTool.getSWCJClass(rr);
+            sclass = com.midream.sheep.swcj.core.build.builds.javanative.BuildTool.getSWCJClass(rr,rc);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        long start = System.currentTimeMillis();
         //注入阶段--->注入全局信息
         injectData(sclass,econtrol);
         //注入方法/增加变量表
@@ -50,8 +49,6 @@ public class EffecientBuilder implements SWCJBuilder {
         if (swcjcl == null) {
             swcjcl = new SWCJClassLoader();
         }
-        long end = System.currentTimeMillis();
-        System.out.println(end- start);
         try {
             Object o = swcjcl.loadData(sclass.getClassName(), bytes).getDeclaredConstructor().newInstance();
             CacheCorn.addObject(rr.getId(), o);
@@ -90,7 +87,6 @@ public class EffecientBuilder implements SWCJBuilder {
             //常量计数加8
             eVariables.constant_Count[1] += 8;
             count++;
-            System.out.println(count);
         }
     }
     private void injectionMethod(SWCJCodeClass swcjCodeClass,SWCJMethod value,int porint,RootReptile rr,ReptileConfig rc,List<String> injection,List<String> vars1){
@@ -127,12 +123,6 @@ public class EffecientBuilder implements SWCJBuilder {
         byte[] method = EConstant.getInstanceMethod(methodNamePointer, descriptionPointer, returnPointer, returnArrayPointer, executePorinter,vars1.size());
         coreTable.methods.add(method);
     }
-
-
-
-
-
-
     private void first(SWCJMethod value,CoreTable coreTable,RootReptile rr,ReptileConfig rc,List<String> injection,List<String> vars1){
         //拼接返回值
         byte[] returnArrayBytes = ("[L" + value.getReturnType().replace("[]", "") + ";").replace(".", "/").getBytes();
@@ -178,7 +168,7 @@ public class EffecientBuilder implements SWCJBuilder {
         for (byte[] bytes : econtrol.methods) {
             size += bytes.length;
         }
-        byte[] datas = new byte[size];
+        byte[] datas = new byte[size+2];
         int zz = 0;
         zz = zz + copy(SWCJCodeClass.magic, datas, zz);
         zz += copy(SWCJCodeClass.versionNumber, datas, zz);
@@ -195,6 +185,7 @@ public class EffecientBuilder implements SWCJBuilder {
         for (byte[] bytes : econtrol.methods) {
             zz += copy(bytes, datas, zz);
         }
+        copy(new byte[]{0x00,0x00}, datas, zz);
         return datas;
     }
 
