@@ -25,7 +25,7 @@ public class main {
         SWCJXmlFactory swcjXmlFactory = new CoreXmlFactory();
         swcjXmlFactory.setBuilder(new EffecientBuilder()).parse(new File("E:\\SWCJ\\core\\SWCJ\\target\\test-classes\\test.xml"));
         pojo html = (pojo)swcjXmlFactory.getWebSpider("getHtml");
-        image[] images = html.getIt("5", "4");
+        image[] images = html.getIt("4");
         for (image image : images) {
             System.out.println(image.toString());
         }
