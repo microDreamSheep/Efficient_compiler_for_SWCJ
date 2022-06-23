@@ -2,7 +2,6 @@ package com.midream.sheep.swcj.core.build.builds.effecient;
 
 import com.midream.sheep.swcj.Exception.ConfigException;
 import com.midream.sheep.swcj.Exception.EmptyMatchMethodException;
-import com.midream.sheep.swcj.Exception.InterfaceIllegal;
 import com.midream.sheep.swcj.cache.CacheCorn;
 import com.midream.sheep.swcj.core.build.builds.effecient.data.EConstant;
 import com.midream.sheep.swcj.core.build.builds.effecient.data.EVariables;
@@ -22,8 +21,6 @@ import com.midream.sheep.swcj.pojo.swc.RootReptile;
 import com.midream.sheep.swcj.util.function.StringUtil;
 
 
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -35,7 +32,7 @@ public class EffecientBuilder implements SWCJBuilder {
         SWCJCodeClass swcjCodeClass = new SWCJCodeClass();
         CoreTable econtrol = swcjCodeClass.getCoreTable();
         EVariables eVariables = swcjCodeClass.getCount();
-        SWCJClass sclass = null;
+        SWCJClass sclass;
         try {
             sclass = com.midream.sheep.swcj.core.build.builds.javanative.BuildTool.getSWCJClass(rr,rc);
         } catch (ClassNotFoundException e) {
@@ -75,7 +72,8 @@ public class EffecientBuilder implements SWCJBuilder {
             //方法计数器自增
             eVariables.methods_count[1]++;
             ReptileUrl ru = rr.getRu().get(count);
-            List<String> injection = BuildTool.getVars(ru,value);
+            List<String> injection = new LinkedList<>();
+            BuildTool.getMethodParametric(ru,value,injection);
             List<String> vars1 = value.getVars();
             if (count == 0) {
                 //第一次方法拼接：
@@ -193,42 +191,5 @@ public class EffecientBuilder implements SWCJBuilder {
         System.arraycopy(yuan, 0, to, zz, yuan.length);
         return yuan.length;
     }
-    private static class BuildTool{
-        public static List<String> getVars(ReptileUrl ru,SWCJMethod value){
-            StringBuilder vars = new StringBuilder();
-            List<String> vars1 = value.getVars();
-            String[] split2 = ru.getInPutName().split(",");
-            List<String> injection = new LinkedList<>();
-            int len = split2.length;
-            if (ru.getInPutName().trim().equals("")) {
-                len = 0;
-            }
-            if (len > vars1.size()) {
-                try {
-                    throw new InterfaceIllegal("方法参数不统一");
-                } catch (InterfaceIllegal var14) {
-                    var14.printStackTrace();
-                }
-            } else {
-                int i;
-                if (len == vars1.size() && len != 0) {
-                    for (i = 0; i < split2.length; ++i) {
-                        StringUtil.add(vars, vars1.get(i), " ", split2[i], ",");
-                        injection.add(split2[i]);
-                    }
-                } else {
-                    System.err.println("SWCJ:警告：你的接口有部分参数没有用到,方法:" + ru.getName());
-                    for (i = 0; i < len; ++i) {
-                        StringUtil.add(vars, vars1.get(i), " ", split2[i], ",");
-                        injection.add(split2[i]);
-                    }
-                    for (i = len; i < vars1.size(); ++i) {
-                        StringUtil.add(vars, vars1.get(i), " args", i, ",");
-                    }
-                }
-            }
-            return injection;
-        }
 
-    }
 }

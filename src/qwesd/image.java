@@ -1,4 +1,4 @@
-package test;
+package qwesd;
 
 public class image {
     private String url;
