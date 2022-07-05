@@ -10,9 +10,8 @@ import com.midream.sheep.swcj.core.build.builds.effecient.function.ByteTool;
 import com.midream.sheep.swcj.core.build.builds.effecient.pojo.SWCJCodeClass;
 import com.midream.sheep.swcj.core.build.builds.effecient.pojo.VariableCode;
 import com.midream.sheep.swcj.core.build.builds.javanative.BuildTool;
-import com.midream.sheep.swcj.core.build.inter.SWCJBuilder;
+import com.midream.sheep.swcj.core.build.inter.SWCJBuilderAbstract;
 import com.midream.sheep.swcj.core.classtool.classloader.SWCJClassLoader;
-import com.midream.sheep.swcj.core.classtool.compiler.SWCJCompiler;
 import com.midream.sheep.swcj.data.ReptileConfig;
 import com.midream.sheep.swcj.pojo.buildup.SWCJClass;
 import com.midream.sheep.swcj.pojo.buildup.SWCJMethod;
@@ -24,15 +23,19 @@ import com.midream.sheep.swcj.util.function.StringUtil;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
-public class EffecientBuilder implements SWCJBuilder {
-    private SWCJClassLoader swcjcl;
+public class EffecientBuilder extends SWCJBuilderAbstract {
     @Override
-    public Object Builder(RootReptile rr, ReptileConfig rc) throws EmptyMatchMethodException, ConfigException {
+    protected Object buildObject(RootReptile rr, ReptileConfig rc) {
         //构建阶段---->获取核心信息
         SWCJCodeClass swcjCodeClass = new SWCJCodeClass();
         CoreTable econtrol = swcjCodeClass.getCoreTable();
         EVariables eVariables = swcjCodeClass.getCount();
-        SWCJClass sclass = com.midream.sheep.swcj.core.build.builds.javanative.BuildTool.getSWCJClass(rr,rc);
+        SWCJClass sclass = null;
+        try {
+            sclass = BuildTool.getSWCJClass(rr,rc);
+        } catch (ConfigException | EmptyMatchMethodException e) {
+            throw new RuntimeException(e);
+        }
         //注入阶段--->注入全局信息
         injectData(sclass,econtrol);
         //注入方法/增加变量表
@@ -42,15 +45,12 @@ public class EffecientBuilder implements SWCJBuilder {
             swcjcl = new SWCJClassLoader();
         }
         try {
-            Object o = swcjcl.loadData(sclass.getClassName(), bytes).getDeclaredConstructor().newInstance();
-            CacheCorn.addObject(rr.getId(), o);
-            return o;
+            return swcjcl.loadData(sclass.getClassName(), bytes).getDeclaredConstructor().newInstance();
         } catch (InstantiationException | NoSuchMethodException | InvocationTargetException |
                  IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
-
     private void injectData(SWCJClass sclass,CoreTable coreTable){
         byte[] interbytes = sclass.getItIterface().replace(".", "/").getBytes();
         coreTable.Constants.set(26, new VariableCode(new byte[]{0x01, 0x00, (byte) interbytes.length}, interbytes));
@@ -140,15 +140,6 @@ public class EffecientBuilder implements SWCJBuilder {
         coreTable.methods.add(SWCJCodeClass.init_method);
         byte[] method = EConstant.getInstanceMethod(0x0F, 0x10, 7, 9,0x04, vars1.size());
         coreTable.methods.add(method);
-    }
-
-    @Override
-    public void setCompiler(SWCJCompiler swcjCompiler) {
-        if (this.swcjcl == null) {
-            this.swcjcl = new SWCJClassLoader();
-        }
-
-        this.swcjcl.setSwcjCompiler(swcjCompiler);
     }
 
     public byte[] getWholeClass(SWCJCodeClass swcjCodeClass) {
