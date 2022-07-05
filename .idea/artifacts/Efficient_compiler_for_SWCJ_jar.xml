@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Efficient_compiler_for_SWCJ:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Efficient_compiler_for_SWCJ_jar</output-path>
+    <root id="archive" name="Efficient_compiler_for_SWCJ.jar">
+      <element id="module-output" name="Efficient_compiler_for_SWCJ" />
+    </root>
+  </artifact>
+</component>

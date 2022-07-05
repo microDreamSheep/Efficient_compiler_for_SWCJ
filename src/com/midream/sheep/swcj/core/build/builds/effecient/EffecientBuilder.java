@@ -32,12 +32,7 @@ public class EffecientBuilder implements SWCJBuilder {
         SWCJCodeClass swcjCodeClass = new SWCJCodeClass();
         CoreTable econtrol = swcjCodeClass.getCoreTable();
         EVariables eVariables = swcjCodeClass.getCount();
-        SWCJClass sclass;
-        try {
-            sclass = com.midream.sheep.swcj.core.build.builds.javanative.BuildTool.getSWCJClass(rr,rc);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        SWCJClass sclass = com.midream.sheep.swcj.core.build.builds.javanative.BuildTool.getSWCJClass(rr,rc);
         //注入阶段--->注入全局信息
         injectData(sclass,econtrol);
         //注入方法/增加变量表
@@ -187,9 +182,9 @@ public class EffecientBuilder implements SWCJBuilder {
         return datas;
     }
 
-    public int copy(byte[] yuan, byte[] to, int zz) {
-        System.arraycopy(yuan, 0, to, zz, yuan.length);
-        return yuan.length;
+    public int copy(byte[] source, byte[] to, int zz) {
+        System.arraycopy(source, 0, to, zz, source.length);
+        return source.length;
     }
 
 }
