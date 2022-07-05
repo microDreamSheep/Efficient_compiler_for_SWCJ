@@ -1,13 +1,5 @@
 package com.midream.sheep.swcj.core.build.builds.effecient.data;
 
-import com.midream.sheep.swcj.core.build.builds.effecient.function.ByteTool;
-import com.sun.org.apache.bcel.internal.generic.BIPUSH;
-
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.util.LinkedList;
-import java.util.List;
-
 public class EConstant {
     //实例方法模板0xff都是注入值的地方
     /*4--->方法名注入
@@ -44,7 +36,7 @@ public class EConstant {
             0x00, 0x00,//没有异常表
             0x00, 0x00//其他表数量为2
     };
-    private static byte[] BipushCode = {0x59, 0x10, (byte) 0xFF, 0x19, (byte) 0xFF, 0x53};
+    private static final byte[] BipushCode = {0x59, 0x10, (byte) 0xFF, 0x19, (byte) 0xFF, 0x53};
     public static byte[] getBipushCode(int count){
         int len = 0;
         byte[] Codes = new byte[count*6];

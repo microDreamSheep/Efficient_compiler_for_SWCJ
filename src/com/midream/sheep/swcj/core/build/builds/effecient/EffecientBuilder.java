@@ -2,7 +2,6 @@ package com.midream.sheep.swcj.core.build.builds.effecient;
 
 import com.midream.sheep.swcj.Exception.ConfigException;
 import com.midream.sheep.swcj.Exception.EmptyMatchMethodException;
-import com.midream.sheep.swcj.cache.CacheCorn;
 import com.midream.sheep.swcj.core.build.builds.effecient.data.EConstant;
 import com.midream.sheep.swcj.core.build.builds.effecient.data.EVariables;
 import com.midream.sheep.swcj.core.build.builds.effecient.data.CoreTable;
@@ -30,7 +29,7 @@ public class EffecientBuilder extends SWCJBuilderAbstract {
         SWCJCodeClass swcjCodeClass = new SWCJCodeClass();
         CoreTable econtrol = swcjCodeClass.getCoreTable();
         EVariables eVariables = swcjCodeClass.getCount();
-        SWCJClass sclass = null;
+        SWCJClass sclass;
         try {
             sclass = BuildTool.getSWCJClass(rr,rc);
         } catch (ConfigException | EmptyMatchMethodException e) {
