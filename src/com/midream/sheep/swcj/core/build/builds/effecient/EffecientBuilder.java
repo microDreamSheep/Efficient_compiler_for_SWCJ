@@ -40,9 +40,6 @@ public class EffecientBuilder extends SWCJBuilderAbstract {
         //注入方法/增加变量表
         injectMethods(swcjCodeClass,sclass,eVariables,econtrol,rr,rc);
         byte[] bytes = getWholeClass(swcjCodeClass);
-        if (swcjcl == null) {
-            swcjcl = new SWCJClassLoader();
-        }
         try {
             return swcjcl.loadData(sclass.getClassName(), bytes).getDeclaredConstructor().newInstance();
         } catch (InstantiationException | NoSuchMethodException | InvocationTargetException |
