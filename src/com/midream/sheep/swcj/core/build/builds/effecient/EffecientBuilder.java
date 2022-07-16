@@ -98,8 +98,7 @@ public class EffecientBuilder extends SWCJBuilderAbstract {
         String executeCharacter = StringUtil.getExecuteCharacter(rr.getRu().get(porint), injection, rc, rr, value).replace("\\\"", "\"");
         byte[] shortBuf = new byte[2];
         for (int i = 0; i < 2; i++) {
-            int offset = (shortBuf.length - 1 - i) * 8;
-            shortBuf[i] = (byte) (((short) executeCharacter.getBytes().length >>> offset) & 0xff);
+            shortBuf[i] = (byte) (((short) executeCharacter.getBytes().length >>> ((shortBuf.length - 1 - i) * 8)) & 0xff);
         }
         coreTable.Constants.add(new VariableCode(ByteTool.ConcatenatedArray(new byte[]{0x01}, shortBuf), executeCharacter.getBytes()));
         coreTable.Constants.add(new VariableCode(new byte[]{0x08},new byte[]{0x00, (byte) coreTable.Constants.size()}));
