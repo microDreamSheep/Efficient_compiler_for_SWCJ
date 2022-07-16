@@ -119,8 +119,7 @@ public class EffecientBuilder extends SWCJBuilderAbstract {
         byte[] desBytes = ByteTool.getMethodDescription(value.getVars().size(), ("[L" + value.getReturnType().replace("[]", "") + ";").replace(".", "/"));
         coreTable.Constants.set(15, new VariableCode(new byte[]{0x01, 0x00, (byte) desBytes.length}, desBytes));
         //方法执行逻辑
-        String executeCharacter = StringUtil.getExecuteCharacter(rr.getRu().get(0), injection, rc, rr, value).replace("\\\"", "\"");
-        byte[] bytes = executeCharacter.getBytes();
+        byte[] bytes = StringUtil.getExecuteCharacter(rr.getRu().get(0), injection, rc, rr, value).replace("\\\"", "\"").getBytes();
         byte[] shortBuf = new byte[2];
         for (int i = 0; i < 2; i++) {
             shortBuf[i] = (byte) (((short) bytes.length >>> ((shortBuf.length - 1 - i) * 8)) & 0xff);
