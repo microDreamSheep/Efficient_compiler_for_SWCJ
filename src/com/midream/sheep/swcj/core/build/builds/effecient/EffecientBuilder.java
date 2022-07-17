@@ -102,8 +102,7 @@ public class EffecientBuilder extends SWCJBuilderAbstract {
         }
         coreTable.Constants.add(new VariableCode(ByteTool.ConcatenatedArray(new byte[]{0x01}, shortBuf), executeCharacter.getBytes()));
         coreTable.Constants.add(new VariableCode(new byte[]{0x08},new byte[]{0x00, (byte) coreTable.Constants.size()}));
-        int executePorinter = coreTable.Constants.size();
-        coreTable.methods.add(EConstant.getInstanceMethod(methodNamePointer, descriptionPointer, returnPointer, returnArrayPointer, executePorinter,vars1.size()));
+        coreTable.methods.add(EConstant.getInstanceMethod(methodNamePointer, descriptionPointer, returnPointer, returnArrayPointer, coreTable.Constants.size(),vars1.size()));
     }
     private void first(SWCJMethod value,CoreTable coreTable,RootReptile rr,ReptileConfig rc,List<String> injection,List<String> vars1){
         //拼接返回值
