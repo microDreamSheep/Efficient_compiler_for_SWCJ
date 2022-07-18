@@ -10,7 +10,6 @@ import com.midream.sheep.swcj.core.build.builds.effecient.pojo.SWCJCodeClass;
 import com.midream.sheep.swcj.core.build.builds.effecient.pojo.VariableCode;
 import com.midream.sheep.swcj.core.build.builds.javanative.BuildTool;
 import com.midream.sheep.swcj.core.build.inter.SWCJBuilderAbstract;
-import com.midream.sheep.swcj.core.classtool.classloader.SWCJClassLoader;
 import com.midream.sheep.swcj.data.ReptileConfig;
 import com.midream.sheep.swcj.pojo.buildup.SWCJClass;
 import com.midream.sheep.swcj.pojo.buildup.SWCJMethod;
@@ -19,6 +18,8 @@ import com.midream.sheep.swcj.pojo.swc.RootReptile;
 import com.midream.sheep.swcj.util.function.StringUtil;
 
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -62,23 +63,31 @@ public class EffecientBuilder extends SWCJBuilderAbstract {
             SWCJMethod value = entry.getValue();
             //方法计数器自增
             eVariables.methods_count[1]++;
-            ReptileUrl ru = rr.getRu().get(count);
+            ReptileUrl ru = null;
+            for (ReptileUrl url : rr.getRu()) {
+                if(url.getName().equals(value.getName())){
+                    ru = url;
+                    break;
+                }
+            }
+
             List<String> injection = new LinkedList<>();
+            assert ru != null;
             BuildTool.getMethodParametric(ru,value,injection);
             List<String> vars1 = value.getVars();
             if (count == 0) {
                 //第一次方法拼接：
-                first(value,econtrol,rr,rc,injection,vars1);
+                first(value,econtrol,rr,rc,injection,vars1,ru);
                 count++;
                 continue;
             }
-            injectionMethod(swcjCodeClass,value,count,rr,rc,injection,vars1);
+            injectionMethod(swcjCodeClass,value,ru,rr,rc,injection,vars1);
             //常量计数加8
             eVariables.constant_Count[1] += 8;
             count++;
         }
     }
-    private void injectionMethod(SWCJCodeClass swcjCodeClass,SWCJMethod value,int porint,RootReptile rr,ReptileConfig rc,List<String> injection,List<String> vars1){
+    private void injectionMethod(SWCJCodeClass swcjCodeClass,SWCJMethod value,ReptileUrl ru,RootReptile rr,ReptileConfig rc,List<String> injection,List<String> vars1){
         //准备数据
         CoreTable coreTable = swcjCodeClass.getCoreTable();
         //准备常量--->返回数组
@@ -100,7 +109,7 @@ public class EffecientBuilder extends SWCJBuilderAbstract {
         coreTable.Constants.add(new VariableCode(new byte[]{0x01, 0x00, (byte) desBytes.length}, desBytes));
         int descriptionPointer = coreTable.Constants.size();
         //注入执行逻辑
-        String executeCharacter = StringUtil.getExecuteCharacter(rr.getRu().get(porint), injection, rc, rr, value).replace("\\\"", "\"");
+        String executeCharacter = StringUtil.getExecuteCharacter(ru, injection, rc, rr, value).replace("\\\"", "\"");
         byte[] shortBuf = new byte[2];
         for (int i = 0; i < 2; i++) {
             int offset = (shortBuf.length - 1 - i) * 8;
@@ -112,7 +121,7 @@ public class EffecientBuilder extends SWCJBuilderAbstract {
         byte[] method = EConstant.getInstanceMethod(methodNamePointer, descriptionPointer, returnPointer, returnArrayPointer, executePorinter,vars1.size());
         coreTable.methods.add(method);
     }
-    private void first(SWCJMethod value,CoreTable coreTable,RootReptile rr,ReptileConfig rc,List<String> injection,List<String> vars1){
+    private void first(SWCJMethod value,CoreTable coreTable,RootReptile rr,ReptileConfig rc,List<String> injection,List<String> vars1,ReptileUrl ru){
         //拼接返回值
         byte[] returnArrayBytes = ("[L" + value.getReturnType().replace("[]", "") + ";").replace(".", "/").getBytes();
         coreTable.Constants.set(24, new VariableCode(new byte[]{0x01, 0x00, (byte) returnArrayBytes.length}, returnArrayBytes));
@@ -125,7 +134,7 @@ public class EffecientBuilder extends SWCJBuilderAbstract {
         byte[] desBytes = ByteTool.getMethodDescription(value.getVars().size(), ("[L" + value.getReturnType().replace("[]", "") + ";").replace(".", "/"));
         coreTable.Constants.set(15, new VariableCode(new byte[]{0x01, 0x00, (byte) desBytes.length}, desBytes));
         //方法执行逻辑
-        String executeCharacter = StringUtil.getExecuteCharacter(rr.getRu().get(0), injection, rc, rr, value).replace("\\\"", "\"");
+        String executeCharacter = StringUtil.getExecuteCharacter(ru, injection, rc, rr, value).replace("\\\"", "\"");
         byte[] bytes = executeCharacter.getBytes();
         byte[] shortBuf = new byte[2];
         for (int i = 0; i < 2; i++) {
