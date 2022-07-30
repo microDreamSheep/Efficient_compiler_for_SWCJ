@@ -1,7 +1,5 @@
 package com.midream.sheep.swcj.core.build.builds.effecient;
 
-import com.midream.sheep.swcj.Exception.ConfigException;
-import com.midream.sheep.swcj.Exception.EmptyMatchMethodException;
 import com.midream.sheep.swcj.core.build.builds.effecient.data.EConstant;
 import com.midream.sheep.swcj.core.build.builds.effecient.data.EVariables;
 import com.midream.sheep.swcj.core.build.builds.effecient.data.CoreTable;
@@ -9,62 +7,47 @@ import com.midream.sheep.swcj.core.build.builds.effecient.function.ByteTool;
 import com.midream.sheep.swcj.core.build.builds.effecient.pojo.SWCJCodeClass;
 import com.midream.sheep.swcj.core.build.builds.effecient.pojo.VariableCode;
 import com.midream.sheep.swcj.core.build.builds.javanative.BuildTool;
-import com.midream.sheep.swcj.core.build.inter.SWCJBuilderAbstract;
-import com.midream.sheep.swcj.data.ReptileConfig;
+import com.midream.sheep.swcj.core.classtool.DataInComplier;
+import com.midream.sheep.swcj.core.classtool.compiler.SWCJCompiler;
+import com.midream.sheep.swcj.data.Constant;
 import com.midream.sheep.swcj.pojo.buildup.SWCJClass;
 import com.midream.sheep.swcj.pojo.buildup.SWCJMethod;
 import com.midream.sheep.swcj.pojo.swc.ReptileUrl;
-import com.midream.sheep.swcj.pojo.swc.RootReptile;
-import com.midream.sheep.swcj.util.function.StringUtil;
+import com.midream.sheep.swcj.pojo.swc.all.ReptlileMiddle;
 
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
-public class EffecientBuilder extends SWCJBuilderAbstract {
-    @Override
-    protected Object buildObject(RootReptile rr, ReptileConfig rc) {
+public class EffecientCompiler implements SWCJCompiler {
+
+    protected byte[] buildBytes(SWCJClass swcjClass, ReptlileMiddle middle) {
         //构建阶段---->获取核心信息
         SWCJCodeClass swcjCodeClass = new SWCJCodeClass();
         CoreTable econtrol = swcjCodeClass.getCoreTable();
         EVariables eVariables = swcjCodeClass.getCount();
-        SWCJClass sclass;
-        try {
-            sclass = BuildTool.getSWCJClass(rr,rc);
-        } catch (ConfigException | EmptyMatchMethodException e) {
-            throw new RuntimeException(e);
-        }
         //注入阶段--->注入全局信息
-        injectData(sclass,econtrol);
+        injectData(swcjClass,econtrol);
         //注入方法/增加变量表
-        injectMethods(swcjCodeClass,sclass,eVariables,econtrol,rr,rc);
-        byte[] bytes = getWholeClass(swcjCodeClass);
-        try {
-            return swcjcl.loadData(sclass.getClassName(), bytes).getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | NoSuchMethodException | InvocationTargetException |
-                 IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        injectMethods(swcjCodeClass,swcjClass,eVariables,econtrol,middle);
+        return getWholeClass(swcjCodeClass);
     }
     private void injectData(SWCJClass sclass,CoreTable coreTable){
         byte[] interbytes = sclass.getItIterface().replace(".", "/").getBytes();
         coreTable.Constants.set(26, new VariableCode(new byte[]{0x01, 0x00, (byte) interbytes.length}, interbytes));
         //注入类名
-        byte[] classNameBytes = sclass.getClassName().replace(".", "/").getBytes();
+        byte[] classNameBytes = (Constant.DEFAULT_PACKAGE_NAME+"."+sclass.getClassName()).replace(".", "/").getBytes();
         coreTable.Constants.set(25, new VariableCode(new byte[]{0x01, 0x00, (byte) classNameBytes.length}, classNameBytes));
 
     }
-    private void injectMethods(SWCJCodeClass swcjCodeClass,SWCJClass sclass,EVariables eVariables,CoreTable econtrol,RootReptile rr,ReptileConfig rc){
+    private void injectMethods(SWCJCodeClass swcjCodeClass,SWCJClass sclass,EVariables eVariables,CoreTable econtrol,ReptlileMiddle middle){
         Set<Map.Entry<String, SWCJMethod>> set = sclass.getMethods().entrySet();
         int count = 0;//指针
         for (Map.Entry<String, SWCJMethod> entry : set) {
             SWCJMethod value = entry.getValue();
+            value.setExecuteStr(value.getExecuteStr().replace("\\\"", "\""));
             //方法计数器自增
             eVariables.methods_count[1]++;
             ReptileUrl ru = null;
-            for (ReptileUrl url : rr.getRu()) {
+            for (ReptileUrl url : middle.getRootReptile().getRu()) {
                 if(url.getName().equals(value.getName())){
                     ru = url;
                     break;
@@ -74,20 +57,19 @@ public class EffecientBuilder extends SWCJBuilderAbstract {
             List<String> injection = new LinkedList<>();
             assert ru != null;
             BuildTool.getMethodParametric(ru,value,injection);
-            List<String> vars1 = value.getVars();
             if (count == 0) {
                 //第一次方法拼接：
-                first(value,econtrol,rr,rc,injection,vars1,ru);
+                first(value,econtrol);
                 count++;
                 continue;
             }
-            injectionMethod(swcjCodeClass,value,ru,rr,rc,injection,vars1);
+            injectionMethod(swcjCodeClass,value);
             //常量计数加8
             eVariables.constant_Count[1] += 8;
             count++;
         }
     }
-    private void injectionMethod(SWCJCodeClass swcjCodeClass,SWCJMethod value,ReptileUrl ru,RootReptile rr,ReptileConfig rc,List<String> injection,List<String> vars1){
+    private void injectionMethod(SWCJCodeClass swcjCodeClass,SWCJMethod value){
         //准备数据
         CoreTable coreTable = swcjCodeClass.getCoreTable();
         //准备常量--->返回数组
@@ -109,7 +91,7 @@ public class EffecientBuilder extends SWCJBuilderAbstract {
         coreTable.Constants.add(new VariableCode(new byte[]{0x01, 0x00, (byte) desBytes.length}, desBytes));
         int descriptionPointer = coreTable.Constants.size();
         //注入执行逻辑
-        String executeCharacter = StringUtil.getExecuteCharacter(ru, injection, rc, rr, value).replace("\\\"", "\"");
+        String executeCharacter = value.getExecuteStr();
         byte[] shortBuf = new byte[2];
         for (int i = 0; i < 2; i++) {
             int offset = (shortBuf.length - 1 - i) * 8;
@@ -118,10 +100,10 @@ public class EffecientBuilder extends SWCJBuilderAbstract {
         coreTable.Constants.add(new VariableCode(ByteTool.ConcatenatedArray(new byte[]{0x01}, shortBuf), executeCharacter.getBytes()));
         coreTable.Constants.add(new VariableCode(new byte[]{0x08},new byte[]{0x00, (byte) coreTable.Constants.size()}));
         int executePorinter = coreTable.Constants.size();
-        byte[] method = EConstant.getInstanceMethod(methodNamePointer, descriptionPointer, returnPointer, returnArrayPointer, executePorinter,vars1.size());
+        byte[] method = EConstant.getInstanceMethod(methodNamePointer, descriptionPointer, returnPointer, returnArrayPointer, executePorinter,value.getVars().size());
         coreTable.methods.add(method);
     }
-    private void first(SWCJMethod value,CoreTable coreTable,RootReptile rr,ReptileConfig rc,List<String> injection,List<String> vars1,ReptileUrl ru){
+    private void first(SWCJMethod value,CoreTable coreTable){
         //拼接返回值
         byte[] returnArrayBytes = ("[L" + value.getReturnType().replace("[]", "") + ";").replace(".", "/").getBytes();
         coreTable.Constants.set(24, new VariableCode(new byte[]{0x01, 0x00, (byte) returnArrayBytes.length}, returnArrayBytes));
@@ -134,7 +116,7 @@ public class EffecientBuilder extends SWCJBuilderAbstract {
         byte[] desBytes = ByteTool.getMethodDescription(value.getVars().size(), ("[L" + value.getReturnType().replace("[]", "") + ";").replace(".", "/"));
         coreTable.Constants.set(15, new VariableCode(new byte[]{0x01, 0x00, (byte) desBytes.length}, desBytes));
         //方法执行逻辑
-        String executeCharacter = StringUtil.getExecuteCharacter(ru, injection, rc, rr, value).replace("\\\"", "\"");
+        String executeCharacter = value.getExecuteStr();
         byte[] bytes = executeCharacter.getBytes();
         byte[] shortBuf = new byte[2];
         for (int i = 0; i < 2; i++) {
@@ -143,7 +125,7 @@ public class EffecientBuilder extends SWCJBuilderAbstract {
         }
         coreTable.Constants.set(18, new VariableCode(ByteTool.ConcatenatedArray(new byte[]{0x01}, shortBuf), executeCharacter.getBytes()));
         coreTable.methods.add(SWCJCodeClass.init_method);
-        byte[] method = EConstant.getInstanceMethod(0x0F, 0x10, 7, 9,0x04, vars1.size());
+        byte[] method = EConstant.getInstanceMethod(0x0F, 0x10, 7, 9,0x04, value.getVars().size());
         coreTable.methods.add(method);
     }
 
@@ -183,5 +165,12 @@ public class EffecientBuilder extends SWCJBuilderAbstract {
         return source.length;
     }
 
+    @Override
+    public DataInComplier compileAndLoad(SWCJClass swcjClass, ReptlileMiddle reptlileMiddle)  {
+        DataInComplier data = new DataInComplier();
+        data.setIsload(false);
+        data.setDatas(buildBytes(swcjClass,reptlileMiddle));
+        return data;
+    }
 }
 
