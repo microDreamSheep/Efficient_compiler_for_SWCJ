@@ -96,7 +96,6 @@ public class CoreTable {
         });
         //返回值 数组-->utf
         add(new byte[0]);
-
         //类名-->utf
         add(new byte[0]);
         //接口名
