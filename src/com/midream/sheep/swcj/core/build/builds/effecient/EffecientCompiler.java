@@ -15,6 +15,9 @@ import com.midream.sheep.swcj.pojo.buildup.SWCJMethod;
 import com.midream.sheep.swcj.pojo.swc.ReptileUrl;
 import com.midream.sheep.swcj.pojo.swc.passvalue.ReptlileMiddle;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 public class EffecientCompiler implements SWCJCompiler {
@@ -170,6 +173,26 @@ public class EffecientCompiler implements SWCJCompiler {
         DataInComplier data = new DataInComplier();
         data.setIsload(false);
         data.setDatas(buildBytes(swcjClass,reptlileMiddle));
+        if(reptlileMiddle.getConfig().isCache()){
+            //io流输出data
+            byte[] datas = data.getDatas();
+            File file = new File(reptlileMiddle.getConfig().getWorkplace() + "/class/");
+            if(!file.exists()){
+                boolean mkdir = file.mkdir();
+            }
+            try (FileOutputStream fileOutputStream = new FileOutputStream(new File(file,swcjClass.getClassName() + ".class"))) {
+                fileOutputStream.write(datas);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            try (FileOutputStream fileOutputStream = new FileOutputStream(new File(reptlileMiddle.getConfig().getWorkplace() + "/ClassCatch.swcj"),true)) {
+                //追加输出类信息
+                fileOutputStream.write((swcjClass.getClassName() + "=" + reptlileMiddle.getRootReptile().getId() + "=" + swcjClass.getClassName() + "\n").getBytes());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
         return data;
     }
 }
