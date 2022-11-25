@@ -49,17 +49,8 @@ public class EffecientCompiler implements SWCJCompiler {
             value.setExecuteStr(value.getExecuteStr().replace("\\\"", "\""));
             //方法计数器自增
             eVariables.methods_count[1]++;
-            ReptileUrl ru = null;
-            for (ReptileUrl url : middle.getRootReptile().getRu()) {
-                if(url.getName().equals(value.getName())){
-                    ru = url;
-                    break;
-                }
-            }
-
             List<String> injection = new LinkedList<>();
-            assert ru != null;
-            BuildTool.getMethodParametric(ru,value,injection);
+            BuildTool.getMethodParametric(value,injection);
             if (count == 0) {
                 //第一次方法拼接：
                 first(value,econtrol);
@@ -187,7 +178,7 @@ public class EffecientCompiler implements SWCJCompiler {
             }
             try (FileOutputStream fileOutputStream = new FileOutputStream(new File(reptlileMiddle.getConfig().getWorkplace() + "/ClassCatch.swcj"),true)) {
                 //追加输出类信息
-                fileOutputStream.write((swcjClass.getClassName() + "=" + reptlileMiddle.getRootReptile().getId() + "=" + swcjClass.getClassName() + "\n").getBytes());
+                fileOutputStream.write((swcjClass.getClassName() + "=" + reptlileMiddle.getSwcjClass().getId() + "=" + swcjClass.getClassName() + "\n").getBytes());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
